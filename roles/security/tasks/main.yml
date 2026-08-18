@@ -1,0 +1,13 @@
+---
+# Master task include list for roles/security
+- name: Apply Kernel and Network Sysctl parameters
+  ansible.builtin.include_tasks: sysctl.yml
+
+- name: Apply SSH daemon security lockdown
+  ansible.builtin.include_tasks: ssh.yml
+
+- name: Apply Filesystem hardening and partition flags
+  ansible.builtin.include_tasks: filesystem.yml
+
+- name: Apply User Account and PAM security policies
+  ansible.builtin.include_tasks: pam.yml

@@ -1,0 +1,19 @@
+# roles/security/tasks/ssh.yml
+
+---
+- name: Enfore secure SSH daemon configuration
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    validate: /usr/sbin/sshd -t -f %s
+  loop:
+    - { regexp: '^(#\s*)?PermitRootLogin', line: 'PermitRootLogin no' }
+    - { regexp: '^(#\s*)?PasswordAuthentication', line: 'PasswordAuthentication no' }
+    - { regexp: '^(#\s*)?PermitEmptyPasswords', line: 'PermitEmptyPasswords no' }
+    - { regexp: '^(#\s*)?MaxAuthTries', line: 'MaxAuthTries 3' }
+    - { regexp: '^(#\s*)?ClientAliveInterval', line: 'ClientAliveInterval 300' }
+    - { regexp: '^(#\s*)?ClientAliveCountMax', line: 'ClientAliveCountMax 2' }
+    - { regexp: '^(#\s*)?X11Forwarding', line: 'X11Forwarding no' }
+  notify: Reload SSH daemon

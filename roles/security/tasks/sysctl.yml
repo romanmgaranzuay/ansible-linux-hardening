@@ -1,0 +1,85 @@
+---
+# roles/security/tasks/sysctl.yml
+
+- name: Enforce Address Space Layout Randomization (ASLR)
+  ansible.posix.sysctl:
+    name: kernel.randomize_va_space
+    value: "2"
+    state: present
+    sysctl_file: /etc/sysctl.d/99-security-hardening.conf
+    reload: true
+
+- name: Restrict access to kernel dmesg buffer
+  ansible.posix.sysctl:
+    name: kernel.dmesg_restrict
+    value: "1"
+    state: present
+    sysctl_file: /etc/sysctl.d/99-security-hardening.conf
+    reload: true
+
+- name: Restrict access to kernel pointers in /proc
+  ansible.posix.sysctl:
+    name: kernel.kptr_restrict
+    value: "2"
+    state: present
+    sysctl_file: /etc/sysctl.d/99-security-hardening.conf
+    reload: true
+
+- name: Disable IP packet forwarding (host is not a router)
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "0"
+    state: present
+    sysctl_file: /etc/sysctl.d/99-security-hardening.conf
+    reload: true
+
+- name: Enable TCP SYN Cookie protection against SYN flood attacks
+  ansible.posix.sysctl:
+    name: net.ipv4.tcp_syncookies
+    value: "1"
+    state: present
+    sysctl_file: /etc/sysctl.d/99-security-hardening.conf
+    reload: true
+
+- name: Disable ICMP redirect acceptance (mitigate MitM attacks)
+  ansible.posix.sysctl:
+    name: "{{ item }}"
+    value: "0"
+    state: present
+    sysctl_file: /etc/sysctl.d/99-security-hardening.conf
+    reload: true
+  loop:
+    - net.ipv4.conf.all.accept_redirects
+    - net.ipv4.conf.default.accept_redirects
+    - net.ipv6.conf.all.accept_redirects
+    - net.ipv6.conf.default.accept_redirects
+
+- name: Ignore ICMP echo broadcasts (mitigate Smurf amplification)
+  ansible.posix.sysctl:
+    name: net.ipv4.icmp_echo_ignore_broadcasts
+    value: "1"
+    state: present
+    sysctl_file: /etc/sysctl.d/99-security-hardening.conf
+    reload: true
+
+- name: Enable source route validation (Reverse Path Filtering / anti-spoofing)
+  ansible.posix.sysctl:
+    name: "{{ item }}"
+    value: "1"
+    state: present
+    sysctl_file: /etc/sysctl.d/99-security-hardening.conf
+    reload: true
+  loop:
+    - net.ipv4.conf.all.rp_filter
+    - net.ipv4.conf.default.rp_filter
+
+- name: Log Martian packets (packets with impossible source addresses)
+  ansible.posix.sysctl:
+    name: "{{ item }}"
+    value: "1"
+    state: present
+    sysctl_file: /etc/sysctl.d/99-security-hardening.conf
+    reload: true
+  loop:
+    - net.ipv4.conf.all.log_martians
+    - net.ipv4.conf.default.log_martians

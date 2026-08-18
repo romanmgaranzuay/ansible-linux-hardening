@@ -1,0 +1,7 @@
+---
+- name: Apply Linux Hardening Baselines
+  hosts: hardening_servers
+  become: true
+
+  roles:
+  - security

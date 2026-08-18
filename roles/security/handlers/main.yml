@@ -1,0 +1,6 @@
+---
+# handlers file for roles/security
+- name: Reload SSH daemon
+  ansible.builtin.service:
+    name: ssh
+    state: reloaded

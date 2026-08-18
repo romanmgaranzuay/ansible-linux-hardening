@@ -1,0 +1,27 @@
+---
+# roles/security/tasks/filesystem.yml
+
+- name: Disable loading of unneeded legacy filesystem kernel modules
+  ansible.builtin.copy:
+    dest: "/etc/modprobe.d/{{ item }}.conf"
+    content: |
+      install {{ item }} /bin/true
+      blacklist {{ item }}
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - cramfs
+    - freevxfs
+    - jffs2
+    - hfs
+    - hfsplus
+    - udf
+
+- name: Secure /dev/shm temporary shared memory mount options
+  ansible.posix.mount:
+    path: /dev/shm
+    src: tmpfs
+    fstype: tmpfs
+    opts: "defaults,nodev,nosuid,noexec"
+    state: mounted

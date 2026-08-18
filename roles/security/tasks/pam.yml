@@ -1,0 +1,35 @@
+---
+# roles/security/tasks/pam.yml
+
+- name: Install PAM password quality checking library
+  ansible.builtin.apt:
+    name: libpam-pwquality
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Configure password aging and umask in /etc/login.defs
+  ansible.builtin.lineinfile:
+    path: /etc/login.defs
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop:
+    - { regexp: '^\s*PASS_MAX_DAYS', line: 'PASS_MAX_DAYS   90' }
+    - { regexp: '^\s*PASS_MIN_DAYS', line: 'PASS_MIN_DAYS   1' }
+    - { regexp: '^\s*PASS_WARN_AGE', line: 'PASS_WARN_AGE   7' }
+    - { regexp: '^\s*UMASK', line: 'UMASK           027' }
+
+- name: Enforce password complexity policies in /etc/security/pwquality.conf
+  ansible.builtin.lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop:
+    - { regexp: '^\s*#?\s*minlen', line: 'minlen = 14' }
+    - { regexp: '^\s*#?\s*dcredit', line: 'dcredit = -1' }
+    - { regexp: '^\s*#?\s*ucredit', line: 'ucredit = -1' }
+    - { regexp: '^\s*#?\s*lcredit', line: 'lcredit = -1' }
+    - { regexp: '^\s*#?\s*ocredit', line: 'ocredit = -1' }
+    - { regexp: '^\s*#?\s*difok', line: 'difok = 3' }
