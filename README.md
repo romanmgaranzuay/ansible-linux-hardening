@@ -80,7 +80,7 @@ ansible-hardening/
    git clone [https://github.com/](https://github.com/)<your-username>/ansible-hardening.git
    cd ansible-hardening
    ```
-2. ** Configure your inventory:**
+2. **Configure your inventory:**
    Update inventory.ini with your target host connection settings (or use local execution).
 
 3. **Execute the playbook:**
