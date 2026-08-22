@@ -19,6 +19,8 @@
     - { regexp: '^\s*PASS_MIN_DAYS', line: 'PASS_MIN_DAYS   1' }
     - { regexp: '^\s*PASS_WARN_AGE', line: 'PASS_WARN_AGE   7' }
     - { regexp: '^\s*UMASK', line: 'UMASK           027' }
+    - { regexp: '^\s*SHA_CRYPT_MIN_ROUNDS', line: 'SHA_CRYPT_MIN_ROUNDS 5000' }
+    - { regexp: '^\s*SHA_CRYPT_MAX_ROUNDS', line: 'SHA_CRYPT_MAX_ROUNDS 5000' }
 
 - name: Enforce password complexity policies in /etc/security/pwquality.conf
   ansible.builtin.lineinfile:

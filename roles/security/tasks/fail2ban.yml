@@ -1,0 +1,43 @@
+---
+# roles/security/tasks/fail2ban.yml
+
+- name: Install Fail2ban intrusion prevention software
+  ansible.builtin.apt:
+    name: fail2ban
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Configure Fail2ban SSH jail configuration
+  ansible.builtin.copy:
+    dest: /etc/fail2ban/jail.local
+    content: |
+      [DEFAULT]
+      bantime = 1h
+      findtime = 10m
+      maxretry = 3
+      backend = systemd
+
+      [sshd]
+      enabled = true
+      port = ssh
+      logpath = %(sshd_log)s
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart fail2ban
+
+- name: Disable unused network protocol kernel modules
+  ansible.builtin.copy:
+    dest: "/etc/modprobe.d/{{ item }}.conf"
+    content: |
+      install {{ item }} /bin/true
+      blacklist {{ item }}
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - dccp
+    - sctp
+    - rds
+    - tipc

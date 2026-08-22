@@ -4,3 +4,14 @@
   ansible.builtin.service:
     name: ssh
     state: reloaded
+
+- name: Restart auditd
+  ansible.builtin.service:
+    name: auditd
+    state: restarted
+
+- name: Restart fail2ban
+  ansible.builtin.service:
+    name: fail2ban
+    state: restarted
+    enabled: yes

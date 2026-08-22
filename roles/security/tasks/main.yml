@@ -11,3 +11,15 @@
 
 - name: Apply User Account and PAM security policies
   ansible.builtin.include_tasks: pam.yml
+
+- name: Apply Linux system auditing and auditd rules
+  ansible.builtin.include_tasks: auditd.yml
+
+- name: Apply Intrusion Prevention and protocol blacklists
+  ansible.builtin.include_tasks: fail2ban.yml
+
+- name: Apply File Integrity and Malware scanning tools
+  ansible.builtin.include_tasks: integrity.yml
+
+- name: Apply Legal Warning banners
+  ansible.builtin.include_tasks: banners.yml

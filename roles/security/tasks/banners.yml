@@ -1,0 +1,19 @@
+---
+# roles/security/tasks/banners.yml
+
+- name: Configure legal warning banners for local and remote logins
+  ansible.builtin.copy:
+    dest: "{{ item }}"
+    content: |
+      *********************************************************************
+      *                       AUTHORIZED ACCESS ONLY                      *
+      * This system is restricted to authorized users. Activities may be  *
+      * monitored, recorded, and audited. Unauthorized access is strictly *
+      * prohibited and subject to criminal/civil penalties.               *
+      *********************************************************************
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - /etc/issue
+    - /etc/issue.net

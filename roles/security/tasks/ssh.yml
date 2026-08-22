@@ -1,7 +1,7 @@
+---
 # roles/security/tasks/ssh.yml
 
----
-- name: Enfore secure SSH daemon configuration
+- name: Enforce secure SSH daemon configuration
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "{{ item.regexp }}"
@@ -16,4 +16,10 @@
     - { regexp: '^(#\s*)?ClientAliveInterval', line: 'ClientAliveInterval 300' }
     - { regexp: '^(#\s*)?ClientAliveCountMax', line: 'ClientAliveCountMax 2' }
     - { regexp: '^(#\s*)?X11Forwarding', line: 'X11Forwarding no' }
+    - { regexp: '^(#\s*)?AllowTcpForwarding', line: 'AllowTcpForwarding no' }
+    - { regexp: '^(#\s*)?AllowAgentForwarding', line: 'AllowAgentForwarding no' }
+    - { regexp: '^(#\s*)?LogLevel', line: 'LogLevel VERBOSE' }
+    - { regexp: '^(#\s*)?MaxSessions', line: 'MaxSessions 2' }
+    - { regexp: '^(#\s*)?TCPKeepAlive', line: 'TCPKeepAlive no' }
+    - { regexp: '^(#\s*)?Banner', line: 'Banner /etc/issue.net' }
   notify: Reload SSH daemon

@@ -1,0 +1,31 @@
+---
+# roles/security/tasks/integrity.yml
+
+- name: Install file integrity, rootkit detection, and package verification tools
+  ansible.builtin.apt:
+    name:
+      - aide
+      - rkhunter
+      - debsums
+      - apt-show-versions
+      - libpam-tmpdir
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Check if compiler libraries exist on disk
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop:
+    - /usr/bin/gcc
+    - /usr/bin/as
+    - /usr/bin/g++
+  register: compiler_stats
+
+- name: Restrict compiler binary execution to root only
+  ansible.builtin.file:
+    path: "{{ item.stat.path }}"
+    mode: '0700'
+    owner: root
+  loop: "{{ compiler_stats.results }}"
+  when: item.stat.exists
