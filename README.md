@@ -2,7 +2,6 @@
 
 Automated, idempotent Linux system hardening pipeline targeting CIS (Center for Internet Security) benchmarks for Ubuntu Server (ARM64). This project implements infrastructure as code (IaC) using Ansible to enforce host-level security configurations, kernel defense-in-depth parameters, and access controls.
 
----
 
 ## Security Audit & Validation (Lynis)
 
@@ -12,13 +11,12 @@ Security posture improvements are benchmarked using Lynis system audits:
 | :--- | :---: | :--- | :--- |
 | **Baseline** | `61` | Stock Ubuntu Server installation | Initial State |
 | **OS Hardening** | `71` | Kernel (`sysctl`), SSH Daemon, PAM, Filesystem | **Completed** |
-| **Auditnig and Detection** | `80+` | System Auditing (`auditd`), Firewall (`ufw`), Auto-updates | In Progress |
+| **Auditnig and Detection** | `TBD` | System Auditing (`auditd`), Firewall (`ufw`), Auto-updates | In Progress |
 
 <p align="center">
   <img src="docs/images/os-hardening-audit-71.png" alt="Lynis Security Audit Score - 71" width="550"/>
 </p>
 
----
 
 ## Implemented Security Controls
 
@@ -46,7 +44,6 @@ Security posture improvements are benchmarked using Lynis system audits:
 * Installs and configures `libpam-pwquality` for strict password complexity (minimum 14 characters, character diversity enforcement, diff requirements).
 * Configures `/etc/login.defs` defaults for password aging (`PASS_MAX_DAYS 90`, `PASS_MIN_DAYS 1`) and restrictive default umasks (`UMASK 027`).
 
----
 
 ## Project Structure
 
@@ -67,3 +64,30 @@ ansible-hardening/
             ├── filesystem.yml # Module blacklisting and mount flags
             └── pam.yml      # Password quality and aging policies
 ```
+
+
+## Getting Started
+
+### Prerequisites
+* Target Host: Ubuntu Server 24.04+ (ARM64 / x86_64)
+* Control Node: Python 3.10+ with `ansible-core` installed
+* Required Collections: `ansible.posix`
+
+### Execution
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/](https://github.com/)<your-username>/ansible-hardening.git
+   cd ansible-hardening
+   ```
+2. **Configure your inventory:**
+   Update inventory.ini with your target host connection settings (or use local execution).
+
+3. **Execute the playbook:**
+   ```bash
+   ansible-playbook -i inventory.ini site.yml
+   ```
+4. **Verify audit status:**
+   ```bash
+   sudo lynis audit system --quick
+   ```
