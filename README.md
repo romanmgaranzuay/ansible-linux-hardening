@@ -11,7 +11,7 @@ Security posture improvements are benchmarked using Lynis system audits:
 | :--- | :---: | :--- | :--- |
 | **Baseline** | `61` | Stock Ubuntu Server installation | Initial State |
 | **OS Hardening** | `71` | Kernel (`sysctl`), SSH Daemon, PAM, Filesystem | **Completed** |
-| **Auditnig and Detection** | `TBD` | System Auditing (`auditd`), Firewall (`ufw`), Auto-updates | In Progress |
+| **Auditnig and Detection** | `80` | System Auditing (`auditd`), Intrusion Prevention (`fail2ban`), FIM (`aide`), Rootkit Scanning (`rkhunter`) | **Complete** |
 
 <p align="center">
   <img src="docs/images/os-hardening-audit-71.png" alt="Lynis Security Audit Score - 71" width="550"/>
@@ -44,6 +44,22 @@ Security posture improvements are benchmarked using Lynis system audits:
 * Installs and configures `libpam-pwquality` for strict password complexity (minimum 14 characters, character diversity enforcement, diff requirements).
 * Configures `/etc/login.defs` defaults for password aging (`PASS_MAX_DAYS 90`, `PASS_MIN_DAYS 1`) and restrictive default umasks (`UMASK 027`).
 
+### 5. System Auditing & Accounting (tasks/auditd.yml)
+* Deploys auditd and audispd-plugins with persistent buffer management.
+* Configures immutable (-e 2) kernel audit rules monitoring modifications to user/group databases (/etc/passwd, /etc/shadow), sudoers privileges, and system locale/network configurations.
+
+### 6. Intrusion Prevention & Detection (tasks/fail2ban.yml)
+* Deploys fail2ban integrated with the systemd journal backend.
+* Enforces dynamic rate-limiting and automated IP banning on repeated SSH authentication failures.
+
+### 7. File Integrity & Malware Detection (tasks/integrity.yml)
+* Deploys AIDE (Advanced Intrusion Detection Environment) for cryptographic file integrity monitoring.
+* Configures RKHunter for rootkit, backdoor, and local exploit scanning.
+* Installs debsums for verifying system package authenticity against known-good upstream checksums.
+* Hardens development toolchains by restricting execution permissions on local compilers (gcc, as, g++) to root only via conditional stat validation.
+
+### 8. Legal Compliance Warning Banners (tasks/banners.yml)
+* Deploys authorized access legal notices to /etc/issue (local console) and /etc/issue.net (remote SSH sessions).
 
 ## Project Structure
 
@@ -62,7 +78,11 @@ ansible-hardening/
             ├── sysctl.yml   # Kernel and network configuration
             ├── ssh.yml      # SSH daemon lockdown
             ├── filesystem.yml # Module blacklisting and mount flags
-            └── pam.yml      # Password quality and aging policies
+            ├── pam.yml      # Password quality and aging policies
+            ├── auditd.yml   # Linux Audit Subsystem configuration
+            ├── fail2ban.yml # Intrusion prevention & transport protocol blocks
+            ├── integrity.yml# File integrity monitoring & compiler restrictions
+            └── banners.yml  # Legal compliance login warning banners
 ```
 
 
