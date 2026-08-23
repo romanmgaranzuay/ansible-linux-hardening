@@ -15,6 +15,7 @@ Security posture improvements are benchmarked using Lynis system audits:
 
 <p align="center">
   <img src="docs/images/os-hardening-audit-71.png" alt="Lynis Security Audit Score - 71" width="550"/>
+  <img src="docs/images/auditing-and-ids-audit-80.png" alt="Lynis Security Audit Score - 78" width="550"/>
 </p>
 
 
