@@ -1,21 +1,20 @@
 # Linux Baseline OS & Kernel Hardening with Ansible
 
-Automated, idempotent Linux system hardening pipeline targeting CIS (Center for Internet Security) benchmarks for Ubuntu Server (ARM64). This project implements infrastructure as code (IaC) using Ansible to enforce host-level security configurations, kernel defense-in-depth parameters, and access controls.
-
+Automated, idempotent Linux system hardening pipeline targeting CIS (Center for Internet Security) benchmarks for Ubuntu Server (ARM64). 
 
 ## Security Audit & Validation (Lynis)
 
 Security posture improvements are benchmarked using Lynis system audits:
 
-| Phase | Hardening Index | Focus Areas | Status |
+| General Focus | Hardening Index | Focus Areas | Status |
 | :--- | :---: | :--- | :--- |
 | **Baseline** | `61` | Stock Ubuntu Server installation | Initial State |
-| **OS Hardening** | `71` | Kernel (`sysctl`), SSH Daemon, PAM, Filesystem | **Completed** |
+| **OS Hardening** | `71` | Kernel (`sysctl`), SSH Daemon(`ssh`), Filesystem(`filesystem`)  | **Completed** |
 | **Auditing and Detection** | `80` | System Auditing (`auditd`), Intrusion Prevention (`fail2ban`), FIM (`aide`), Rootkit Scanning (`rkhunter`) | **Complete** |
 
 <p align="center">
   <img src="docs/images/os-hardening-audit-71.png" alt="Lynis Security Audit Score - 71" width="550"/>
-  <img src="docs/images/auditing-and-ids-audit-80.png" alt="Lynis Security Audit Score - 78" width="550"/>
+  <img src="docs/images/auditing-and-ids-audit-80.png" alt="Lynis Security Audit Score - 80" width="550"/>
 </p>
 
 
@@ -45,21 +44,21 @@ Security posture improvements are benchmarked using Lynis system audits:
 * Installs and configures `libpam-pwquality` for strict password complexity (minimum 14 characters, character diversity enforcement, diff requirements).
 * Configures `/etc/login.defs` defaults for password aging (`PASS_MAX_DAYS 90`, `PASS_MIN_DAYS 1`) and restrictive default umasks (`UMASK 027`).
 
-### 5. System Auditing & Accounting (tasks/auditd.yml)
+### 5. System Auditing & Accounting (`tasks/auditd.yml`)
 * Deploys auditd and audispd-plugins with persistent buffer management.
 * Configures immutable (-e 2) kernel audit rules monitoring modifications to user/group databases (/etc/passwd, /etc/shadow), sudoers privileges, and system locale/network configurations.
 
-### 6. Intrusion Prevention & Detection (tasks/fail2ban.yml)
+### 6. Intrusion Prevention & Detection (`tasks/fail2ban.yml`)
 * Deploys fail2ban integrated with the systemd journal backend.
 * Enforces dynamic rate-limiting and automated IP banning on repeated SSH authentication failures.
 
-### 7. File Integrity & Malware Detection (tasks/integrity.yml)
+### 7. File Integrity & Malware Detection (`tasks/integrity.yml`)
 * Deploys AIDE (Advanced Intrusion Detection Environment) for cryptographic file integrity monitoring.
 * Configures RKHunter for rootkit, backdoor, and local exploit scanning.
 * Installs debsums for verifying system package authenticity against known-good upstream checksums.
 * Hardens development toolchains by restricting execution permissions on local compilers (gcc, as, g++) to root only via conditional stat validation.
 
-### 8. Legal Compliance Warning Banners (tasks/banners.yml)
+### 8. Legal Compliance Warning Banners (`tasks/banners.yml`)
 * Deploys authorized access legal notices to /etc/issue (local console) and /etc/issue.net (remote SSH sessions).
 
 ## Project Structure
@@ -98,11 +97,13 @@ ansible-hardening/
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/](https://github.com/)<your-username>/ansible-hardening.git
+   git clone https://github.com/<your-username>/ansible-hardening.git
    cd ansible-hardening
    ```
 2. **Configure your inventory:**
+  ```text
    Update inventory.ini with your target host connection settings (or use local execution).
+  ```
 
 3. **Execute the playbook:**
    ```bash
@@ -113,7 +114,7 @@ ansible-hardening/
    sudo aideinit && sudo cp /var/lib/aide/aide.db.new /var/lib/aide/aide.db
    sudo rkhunter --propupd
    ```
-6.  **Verify audit status:**
+5. **Verify audit status:**
    ```bash
    sudo lynis audit system --quick
    ```
