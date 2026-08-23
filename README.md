@@ -108,7 +108,12 @@ ansible-hardening/
    ```bash
    ansible-playbook -i inventory.ini site.yml
    ```
-4. **Verify audit status:**
+4. **Initialize Host Integrity Baselines**
+   ```bash
+   sudo aideinit && sudo cp /var/lib/aide/aide.db.new /var/lib/aide/aide.db
+   sudo rkhunter --propupd
+   ```
+6.  **Verify audit status:**
    ```bash
    sudo lynis audit system --quick
    ```
