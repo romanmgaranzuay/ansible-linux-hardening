@@ -11,7 +11,7 @@ Security posture improvements are benchmarked using Lynis system audits:
 | :--- | :---: | :--- | :--- |
 | **Baseline** | `61` | Stock Ubuntu Server installation | Initial State |
 | **OS Hardening** | `71` | Kernel (`sysctl`), SSH Daemon, PAM, Filesystem | **Completed** |
-| **Auditnig and Detection** | `80` | System Auditing (`auditd`), Intrusion Prevention (`fail2ban`), FIM (`aide`), Rootkit Scanning (`rkhunter`) | **Complete** |
+| **Auditing and Detection** | `80` | System Auditing (`auditd`), Intrusion Prevention (`fail2ban`), FIM (`aide`), Rootkit Scanning (`rkhunter`) | **Complete** |
 
 <p align="center">
   <img src="docs/images/os-hardening-audit-71.png" alt="Lynis Security Audit Score - 71" width="550"/>
