@@ -65,24 +65,24 @@ Security posture improvements are benchmarked using Lynis system audits:
 
 ```text
 ansible-hardening/
-├── ansible.cfg              # Ansible execution settings & privilege escalation
-├── inventory.ini            # Target hosts and connection parameters
-├── site.yml                 # Master playbook
-├── docs/images/             # Audit scans and metric screenshots
+├── ansible.cfg                # Ansible execution settings & privilege escalation
+├── inventory.ini              # Target hosts and connection parameters
+├── site.yml                   # Master playbook
+├── docs/images/               # Audit scans and metric screenshots
 └── roles/
     └── security/
         ├── handlers/
-        │   └── main.yml     # Service notifications (e.g., sshd reload)
+        │   └── main.yml       # Service notifications (e.g., sshd reload)
         └── tasks/
-            ├── main.yml     # Role execution entry point
-            ├── sysctl.yml   # Kernel and network configuration
-            ├── ssh.yml      # SSH daemon lockdown
+            ├── main.yml       # Role execution entry point
+            ├── sysctl.yml     # Kernel and network configuration
+            ├── ssh.yml        # SSH daemon lockdown
             ├── filesystem.yml # Module blacklisting and mount flags
-            ├── pam.yml      # Password quality and aging policies
-            ├── auditd.yml   # Linux Audit Subsystem configuration
-            ├── fail2ban.yml # Intrusion prevention & transport protocol blocks
-            ├── integrity.yml# File integrity monitoring & compiler restrictions
-            └── banners.yml  # Legal compliance login warning banners
+            ├── pam.yml        # Password quality and aging policies
+            ├── auditd.yml     # Linux Audit Subsystem configuration
+            ├── fail2ban.yml   # Intrusion prevention & transport protocol blocks
+            ├── integrity.yml  # File integrity monitoring & compiler restrictions
+            └── banners.yml    # Legal compliance login warning banners
 ```
 
 
