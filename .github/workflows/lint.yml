@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  lint: 
+  lint:
     name: Lint Playbooks & Syntax Check
     runs-on: ubuntu-latest
 
@@ -28,7 +28,7 @@ jobs:
       - name: Install required Ansible collections
         run: |
           ansible-galaxy collection install community.general
-      
+
       - name: Run YAML Linting
         run: |
           yamllint . -d "{extends: relaxed, rules: {line-length: {max: 180}}}"
@@ -36,7 +36,7 @@ jobs:
       - name: Run Ansible Syntax Check
         run: |
           ansible-playbook --syntax-check site.yml --syntax-check
-      
+
       - name: Run Ansible Lint
         run: |
           ansible-lint site.yml
