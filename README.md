@@ -1,5 +1,7 @@
 # Linux Baseline OS & Kernel Hardening with Ansible
 
+[![Ansible CI & Security Lint](https://github.com/romanmgaranzuay/ansible-linux-hardening/actions/workflows/lint.yml/badge.svg)](https://github.com/romanmgaranzuay/ansible-linux-hardening/actions/workflows/lint.yml)
+
 Automated, idempotent Linux system hardening pipeline targeting CIS (Center for Internet Security) benchmarks for Ubuntu Server (ARM64). 
 
 ## Security Audit & Validation (Lynis)
