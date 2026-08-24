@@ -1,0 +1,42 @@
+name: Ansible CI and Security Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint: 
+    name: Lint Playbooks & Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install ansible-core ansible-lint yamllint
+
+      - name: Install required Ansible collections
+        run: |
+          ansible-galaxy collection install community.general
+      
+      - name: Run YAML Linting
+        run: |
+          yamllint . -d "{extends: relaxed, rules: {line-length: {max: 180}}}"
+
+      - name: Run Ansible Syntax Check
+        run: |
+          ansible-playbook --syntax-check site.yml --syntax-check
+      
+      - name: Run Ansible Lint
+        run: |
+          ansible-lint site.yml
