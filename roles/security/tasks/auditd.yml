@@ -7,14 +7,14 @@
       - auditd
       - audispd-plugins
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
 
 - name: Enable and start auditd service
   ansible.builtin.service:
     name: auditd
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Configure core audit rules
   ansible.builtin.copy:

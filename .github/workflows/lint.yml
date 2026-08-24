@@ -24,6 +24,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install ansible-core ansible-lint yamllint
+          ansible-galaxy collection install ansible.posix
 
       - name: Install required Ansible collections
         run: |
@@ -35,7 +36,7 @@ jobs:
 
       - name: Run Ansible Syntax Check
         run: |
-          ansible-playbook --syntax-check site.yml --syntax-check
+          ansible-playbook -i inventory.ini site.yml --syntax-check
 
       - name: Run Ansible Lint
         run: |

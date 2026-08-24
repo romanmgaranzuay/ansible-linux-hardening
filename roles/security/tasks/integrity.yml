@@ -10,7 +10,7 @@
       - apt-show-versions
       - libpam-tmpdir
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
 
 - name: Check if compiler libraries exist on disk
@@ -20,12 +20,12 @@
     - /usr/bin/gcc
     - /usr/bin/as
     - /usr/bin/g++
-  register: compiler_stats
+  register: security_compiler_stats
 
 - name: Restrict compiler binary execution to root only
   ansible.builtin.file:
     path: "{{ item.stat.path }}"
     mode: '0700'
     owner: root
-  loop: "{{ compiler_stats.results }}"
+  loop: "{{ security_compiler_stats.results }}"
   when: item.stat.exists

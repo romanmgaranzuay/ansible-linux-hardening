@@ -5,7 +5,7 @@
   ansible.builtin.apt:
     name: libpam-pwquality
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
 
 - name: Configure password aging and umask in /etc/login.defs

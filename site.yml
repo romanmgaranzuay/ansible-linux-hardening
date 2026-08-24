@@ -1,6 +1,6 @@
 ---
 - name: Apply Linux Hardening Baselines
-  hosts: hardening_servers
+  hosts: all
   become: true
 
   roles:
