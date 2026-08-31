@@ -108,7 +108,7 @@ ansible-hardening/
 ## Takeaways and Tradeoffs 
 * **Balancing Security vs. Usability**: Pushing for a 100/100 Lynis score often requires extreme kernel lockdowns that disable essential development tools, and degrade system performance. A Hardening Index of 80 strikes the ideal balance between rigorous enterprise compliance (CIS Level 1) and operational maintainability.
 
-* **Idempotency in Automation**: Designing tasks with validation checks (e.g., validate: /usr/sbin/sshd -t -f %s) ensures repeated playbook runs enforce baseline state without service interruptions or configuration drift.
+* **Idempotency in Automation**: Designing tasks with validation checks ensures repeated playbook runs enforce baseline state without service interruptions or configuration drift.
 
 
 ## Try it yourself
