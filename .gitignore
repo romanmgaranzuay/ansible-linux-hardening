@@ -1,5 +1,27 @@
+# Virtual Environments
+.venv/
+bin/
+lib/
+include/
+pyvenv.cfg
+
+# Terraform State & Secrets
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Ansible & OS Cache
 *.retry
-*.log
-.ansible/
+.cache/
 __pycache__/
-*.swp
+.DS_Store

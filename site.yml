@@ -1,6 +1,6 @@
 ---
 - name: Apply Linux Hardening Baselines
-  hosts: all
+  hosts: aws_hardening_targets
   become: true
 
   roles:

@@ -1,5 +1,12 @@
 ---
 # roles/security/tasks/ssh.yml
+- name: Ensure SSH privelege separation directory exists
+  ansible.builtin.file:
+    path: /var/run/sshd
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
 
 - name: Enforce secure SSH daemon configuration
   ansible.builtin.lineinfile:
