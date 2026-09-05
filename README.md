@@ -138,7 +138,9 @@ ansible-hardening/
 ## Takeaways and Tradeoffs 
 * **Local vs Cloud Score Differences (Lynis 80 vs 79)**: Local machine hardening scores (**80**) rely on dedicated disk partitioning. On cloud architectures, the multi-partition scheme adds unnecessary overhead for disk expansion and can break application runtimes. Achieving a **79** is ideal for CIS compliance while maintaining cloud operability.
 
-* **Zero-Ingress Transport**: Running Ansible over SSM and not SSH requires routing execution staging through S3 bucket with restrictive IAM access.
+* **Zero-Ingress Transport**: Running Ansible over SSM and not SSH requires standardizing on `ansible_user=ssm-user` and routing execution staging through S3 bucket with restrictive IAM access.
+
+* **Preserving Hardened Configs During Upgrades**: Automated package upgrades (apt-get dist-upgrade) trigger maintainer file overwrite prompts. CIS-managed templates (such as /etc/ssh/sshd_config) need to be retained to maintain configuration baseline integrity.
 
 * **Idempotency in Automation**: Designing tasks with validation checks ensures repeated playbook runs enforce baseline state without service interruptions or configuration drift.
 
