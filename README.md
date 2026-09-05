@@ -160,9 +160,7 @@ ansible-hardening/
    cd ansible-hardening
    ```
 2. **Configure your inventory:**
-   ```text
    Update inventory.ini with your target host connection settings (or use local execution).
-   ```
    ```ini
    [aws_hardening_targets]
    i-037ff79be19ce2ed8
