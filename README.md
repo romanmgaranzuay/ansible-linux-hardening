@@ -14,7 +14,8 @@ Security posture improvements are benchmarked using Lynis system audits across s
 | :--- | :---: | :--- | :--- |
 | **Baseline** | `61` | Stock Ubuntu Server 24.04 LTS installation | Initial State |
 | **OS Hardening** | `71` | Kernel (`sysctl`), SSH Daemon (`ssh`), Filesystem mounts (`filesystem`) | Completed |
-| **Auditing & Detection** | `80` | Kernel Auditing (`auditd`), Intrusion Prevention (`fail2ban`), FIM (`aide`), Rootkits (`rkhunter`) | **Completed** |
+| **Auditing & Detection (Local VM)** | `80` | Kernel Auditing (`auditd`), Intrusion Prevention (`fail2ban`), FIM (`aide`), Rootkits (`rkhunter`) | **Completed** |
+| **AWS Cloud Hardening & SSM Baseline** | `79` | UFW Firewall, Process Accounting Daemons (`acct`, `sysstat`), Zero-Ingress Security Group | **Completed** |
 
 <p align="center">
   <img src="docs/images/os-hardening-audit-71.png" alt="Lynis Security Audit Score - 71" width="45%" />
@@ -22,6 +23,31 @@ Security posture improvements are benchmarked using Lynis system audits across s
 </p>
 
 ---
+
+## 🏗️ Architecture: Zero-Ingress Cloud Deployment
+
+The pipeline deploys and hardens instances without exposing administrative network interfaces to the public internet:
+
+```text
+[ Developer Workstation ] (macOS / Python venv)
+         │
+         │  Ansible Playbook via community.aws.aws_ssm transport
+         ▼
+[ AWS Systems Manager / S3 Staging Bucket ]
+         │
+         │  Encrypted Agent Channel (Outbound HTTPS 443 Only)
+         ▼
+[ AWS Custom VPC (10.0.0.0/16) ]
+    └── [ Public Subnet (10.0.0.0/24) ]
+            └── [ EC2 t4g.micro (ARM64 / Ubuntu 24.04 LTS) ]
+                     ├── Security Group: 0 Inbound Rules (Port 22 Closed)
+                     ├── Host Firewall: UFW Default-Deny Ingress
+                     ├── Auditing Subsystems: auditd + AIDE + fail2ban
+                     └── Output Artifact: Hardened Golden AMI (ami-0bbf26689dd6f40b6)
+```
+* **No Open SSH Port**: Admin access is managed out-of-band via AWS Systems Manager Session Manager, removing SSH brute-force attack vectors.
+* **Ephemeral Staging**: Playbooks and payload files are staged in a private S3 bucket and led down dynamically by AWS SSM Agent. 
+* **Immutable Snapshot**: Compliant image captured as reusable Golden AMI before destroying EC2 instance. 
 
 ## 🛡️ Implemented Security Controls
 
@@ -52,10 +78,11 @@ Security posture improvements are benchmarked using Lynis system audits across s
 ### 5. Kernel Auditing & System Accounting (`tasks/auditd.yml`)
 * Deploys `auditd` and `audispd-plugins` with persistent buffer management.
 * Configures immutable (`-e 2`) kernel audit rules monitoring modifications to authentication databases (`/etc/passwd`, `/etc/shadow`), sudoers privileges, and system network configurations.
+* Enables process accounting daemons `sysstat` and `acct`.
 
-### 6. Dynamic Intrusion Prevention (`tasks/fail2ban.yml`)
+### 6. Dynamic Intrusion Prevention & Firewall
 * Integrates `fail2ban` with the `systemd` journal backend.
-* Automatically bans offending IPs upon repeated SSH authentication failures to stop brute-force attacks.
+* Configures `ufw` with default-deny ingress policy behind AWS Security Groups.
 
 ### 7. File Integrity Monitoring & Toolchain Lockdown (`tasks/integrity.yml`)
 * Deploys **AIDE** (Advanced Intrusion Detection Environment) for cryptographic file integrity monitoring.
@@ -84,8 +111,11 @@ ansible-hardening/
 ├── .github/
 │   └── workflows/
 │       └── lint.yml           # CI workflow for syntax & security linting
+├── terraform/                 # AWS Infrastructure as Code definitions
+│   ├── main.tf                # VPC, IAM Instance Profile, S3 Staging Bucket, EC2
+│   └── .terraform.lock.hcl    # Deterministic provider version locks
 ├── ansible.cfg                # Execution settings & privilege escalation
-├── inventory.ini              # Target host definitions and transport settings
+├── inventory.ini              # Target host definitions (SSM transport configuration)
 ├── site.yml                   # Master orchestration playbook
 ├── docs/
 │   └── images/                # Audit scan evidence and validation metrics
@@ -96,7 +126,7 @@ ansible-hardening/
         └── tasks/
             ├── main.yml       # Primary task execution entry point
             ├── sysctl.yml     # Kernel tuning and network defense
-            ├── ssh.yml        # SSH daemon hardening
+            ├── ssh.yml        # SSH daemon hardening & privilege separation
             ├── filesystem.yml # Filesystem restrictions and module blacklisting
             ├── pam.yml        # PAM policies and password aging
             ├── auditd.yml     # Linux audit subsystem rules
@@ -106,7 +136,9 @@ ansible-hardening/
 ```
 
 ## Takeaways and Tradeoffs 
-* **Balancing Security vs. Usability**: Pushing for a 100/100 Lynis score often requires extreme kernel lockdowns that disable essential development tools, and degrade system performance. A Hardening Index of 80 strikes the ideal balance between rigorous enterprise compliance (CIS Level 1) and operational maintainability.
+* **Local vs Cloud Score Differences (Lynis 80 vs 79)**: Local machine hardening scores (**80**) rely on dedicated disk partitioning. On cloud architectures, the multi-partition scheme adds unnecessary overhead for disk expansion and can break application runtimes. Achieving a **79** is ideal for CIS compliance while maintaining cloud operability.
+
+* **Zero-Ingress Transport**: Running Ansible over SSM and not SSH requires routing execution staging through S3 bucket with restrictive IAM access.
 
 * **Idempotency in Automation**: Designing tasks with validation checks ensures repeated playbook runs enforce baseline state without service interruptions or configuration drift.
 
@@ -115,8 +147,8 @@ ansible-hardening/
 
 ### Prerequisites
 * Target Host: Ubuntu Server 24.04+ (ARM64 / x86_64)
-* Control Node: Python 3.10+ with `ansible-core` installed
-* Required Collections: `ansible.posix`
+* Local Workstation: Python 3.10+ in a virtual environment (`.venv`), Terraform 1.5+, AWS CLI configured with appropriate admin permissions. 
+* Required Collections: `ansible-galaxy collection install amazon.aws community.aws ansible.posix`
 
 ### Execution Steps:
 
@@ -129,17 +161,47 @@ ansible-hardening/
    ```text
    Update inventory.ini with your target host connection settings (or use local execution).
    ```
+   ```ini
+   [aws_hardening_targets]
+   i-037ff79be19ce2ed8
+
+   [aws_hardening_targets:vars]
+   ansible_connection=community.aws.aws_ssm
+   ansible_aws_ssm_region=us-east-1
+   ansible_aws_ssm_bucket_name=ansible-ssm-staging-your-bucket-id
+   ansible_user=ssm-user
+   ansible_become=true
+   ansible_python_interpreter=/usr/bin/python3
+   ```
 
 3. **Execute the playbook:**
    ```bash
+   export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES # If running Python under macOS Apple Silicon...resolves POSIX fork() constraints
    ansible-playbook -i inventory.ini site.yml
    ```
-4. **Initialize Host Integrity Baselines**
+4. **Initialize Integrity Baselines and Audit via SSM**
    ```bash
+   aws ssm start-session --target <INSTANCE_ID>
+
+   # Inside SSM Session:
    sudo aideinit && sudo cp /var/lib/aide/aide.db.new /var/lib/aide/aide.db
    sudo rkhunter --propupd
-   ```
-5. **Verify audit status:**
-   ```bash
    sudo lynis audit system --quick
+   exit
+   ```
+5. **Bake Golden AMI and Destroy**
+   ```bash
+   # Bake AMI (From local workstation)
+   aws ec2 create-image \
+      --instance-id <INSTANCE_ID> \
+      --name "ubuntu-24.04-arm64-hardened-cis-$(date +%Y%m%d)" \
+      --description "Ubuntu 24.04 ARM64 CIS hardened image" \
+      --no-reboot
+
+   # Wait for availability
+   aws ec2 wait image-available --image-ids <NEW_IMAGE_ID>
+
+   # Tear down compute infrastructure to stop billing
+   cd terraform
+   terraform destroy -auto-approve
    ```
