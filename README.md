@@ -2,7 +2,7 @@
 
 [![Ansible CI & Security Lint](https://github.com/romanmgaranzuay/ansible-linux-hardening/actions/workflows/lint.yml/badge.svg)](https://github.com/romanmgaranzuay/ansible-linux-hardening/actions/workflows/lint.yml)
 
-Automated, idempotent Linux system hardening pipeline targeting Center for Internet Security (CIS) benchmarks for Ubuntu Server (ARM64 / x86_64).
+Automated, idempotent Linux system hardening pipeline targeting Center for Internet Security (CIS) benchmarks for Ubuntu Server (ARM64).
 
 ---
 
